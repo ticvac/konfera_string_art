@@ -38,6 +38,11 @@ def make_stringart(
     imgcircle[~mask] = 255
     imginverted = np.full(img.shape, 255) - imgcircle
 
+    orig = img.copy()
+    mask = create_circular_mask(orig.shape[0], orig.shape[1])
+    orig[~mask] = 255
+    stopping_point = np.mean(orig) * 1.1
+
     img = imginverted
 
     def generate_circle_points(center, radius, n):
@@ -114,7 +119,7 @@ def make_stringart(
         start = best[0]
 
         # print(np.mean(canvas))
-        if np.mean(canvas) < 127:
+        if np.mean(canvas) < stopping_point:
             break
 
     # print(np.mean(canvas))

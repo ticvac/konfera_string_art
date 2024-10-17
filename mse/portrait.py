@@ -1,5 +1,5 @@
 import cv2
-from make_stringart import make_stringart
+from video.make_stringart import make_stringart
 
 
 res = (400, 400)
