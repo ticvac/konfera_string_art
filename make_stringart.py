@@ -4,9 +4,15 @@ import math
 from bresenham import bresenham as line_iter
 from matplotlib import pyplot as plt
 
+from tqdm import tqdm
+import config
+N = config.N
+RESOLUTION = config.RESOLUTION
+THICKNES = config.THICKNES
+STOP_RATIO = config.STOP_RATIO
 
 def make_stringart(
-    img: np.ndarray, color: int, thickness: int, resolution: tuple = (500, 500)
+    img: np.ndarray, color: int, thickness: int = THICKNES, resolution: tuple = RESOLUTION
 ):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.resize(img, resolution)
@@ -54,7 +60,7 @@ def make_stringart(
     orig = img.copy()
     mask = create_circular_mask(orig.shape[0], orig.shape[1])
     orig[~mask] = 255
-    stopping_point = np.mean(orig) * 1.1
+    stopping_point = np.mean(orig) * STOP_RATIO
 
     #
     def generate_circle_points(center, radius, n):
@@ -67,8 +73,7 @@ def make_stringart(
 
     center = (img.shape[0] // 2, img.shape[1] // 2)
     radius = min(img.shape) // 2 - 5
-    n = 200
-    circle_points = generate_circle_points(center, radius, n)
+    circle_points = generate_circle_points(center, radius, N)
 
     # Plot the points on the image
     # img_gray = np.full_like(img, 0, dtype=np.uint8)
@@ -86,7 +91,7 @@ def make_stringart(
 
     spagat = [0]
 
-    while True:
+    while np.mean(canvas) > stopping_point:
         from_pos = circle_points[spagat[-1]]
         best = [-1, -math.inf]
         for indx, to_pos in enumerate(circle_points):
@@ -130,7 +135,8 @@ def make_stringart(
         spagat.append(best[0])
         start = best[0]
 
-        print(np.mean(canvas))
+        print(np.mean(canvas)-stopping_point)
+        print(len(spagat))
         if np.mean(canvas) < stopping_point:
             break
 
@@ -148,7 +154,13 @@ def make_stringart(
 
 
 if __name__ == "__main__":
-    img = cv2.imread("honza.png")
-    string_img = make_stringart(img, 40, 2, resolution=(250, 250))
-    plt.imshow(string_img, cmap="gray")
+    img = cv2.imread("fav.jpg")
+    string_img = make_stringart(img, 40, THICKNES, resolution = RESOLUTION)
+    f,axxar = plt.subplots(1,2)
+
+    axxar[0].imshow(string_img, cmap="gray")
+    axxar[1].imshow(img)
     plt.show()
+    plt.savefig("stri-fav.png")
+    plt.savefig("stri-fav.jpg")
+    plt.savefig("stri-fav.pdf")
