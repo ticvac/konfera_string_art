@@ -106,53 +106,40 @@
 
 \section{Co je to string-art?}
 \label{sec:string-art}
-String-art je umělecká forma kdy se snažíme přiblížit nějakému obrázku pomocí
-natahování nití v kruhu. Protože string-art je činnost veskrze praktická máme k
-dispozici pouze konečně mnoho špendlíků ($n$), které se nacházejí po obvodu.
+String-art je výtvarná technika, při níž se snažíme napodobit nějaký obrázek pomocí $k$
+nití\footnote{V průběhu přeformulujeme naši úlohu tak, aby namísto konstantního počtu nitek byla konstantní odchylka od originálu, kterého se snažíme dosáhnout.}, které natahujeme mezi špendlíky rozmístěnými po obvodu kruhu. Protože string-art je činnost veskrze praktická, máme k dispozici pouze konečně mnoho špendlíků ($n$).
 
-Naším cílem je mezi nimi natáhnout celkem $k$ nitek\footnote{V průběhu
-	přeformulujeme naší úlohu tak aby namísto konstantního počtu nitek byla konstantní
-	odchylka od originálu, které se snažíme dosáhnout.} tak aby se výsledek co
-nejlépe podobal nějakému předem vybranému obrázku. Na vyřešení této úlohy jsme
-zpracovali dva algoritmy.
+Náplň naší konfery ovšem nespočívala tolik v natahování nití mezi špedlíky\footnote{O to se Jáchym rovněž pokusil (zda úspěšně či neúspšně měli možnost posoudit všichni účastníci podzimního soustředění).}, ale spíše v hledání algoritmu, který určí, mezi kterými dvojicemi špendlíků má vést linie, aby byl vytvořený obrázek co nejpodobnější námi zvolenému originálu. Tento problém více či méně úspěšně řeší dva námi vymyšlené algoritmy.
 
 
 \section{Algoritmy}
 \label{sec:algoritmy}
-Algoritmy v této sekci představíme a porovnáme jejich výhody a nevýhody. Zároveň
-představíme jejich asymptotickou časovou složitost s pomocí notace $O$. Jestliže
-jste s touto notací neseznámeni doporučujeme si o ní něco přečíst.
+V této sekci představíme algoritmy, popíšeme jejich výhody i nevýhody a určíme jejich asymptotickou časovou složitost pomocí notace $O$. Jestliže jste s touto notací neseznámeni, doporučujeme si o ní něco přečíst.
 
 \subsection{Všechny možnosti!}
 \label{ssec:vsechny-moznosti}
-Asi jednodušší myšlenkou která nás napadne, chceme-li řešit takovýto problém je:
-zkusím všechny možné čáry a vezmu jen ty nejlepší. Touto myšlenkou se také řídil
-náš první algoritmus. Aby to nebylo tak jednoduché musíme si nějak chytře
-definovat jak dobrá je každá čára.
+Asi jednodušší myšlenka, která nás při řešení napadla a stala se proto základem našeho prvního algortimu, byla:
+zkusíme všechny možné čáry a vybere jen $k$ nejlepších. 
+Aby to nebylo tak jednoduché, musíme si nějak chytře definovat, jak dobrá je každá čára, abychom mohli vybrat ty nejlepší.
 
-Tento problém jsme řešili tak, že na prázdné plátno nakreslíme jen tu čáru
-samotnou a poté celý tento obrázek odečteme od toho původního. Díky tomu, že zatím řešíme
-pouze černobílé obrázky, stačí odečíst každý pixel z jednoho obrázku s
-korespondujícím pixelem z toho druhého. Všechny tyto rozdíly poté sečteme,
-umocníme a vydělíme počtem pixelů.\footnote{Této metodě se v praxi říká MSE
- (Mean Square Error) a pro její používanost jsme rozhodli pro ni.} Této hodnotě
-dále budeme říkat rozdíl čáry a originálu.
+Tento problém se dá řešit následujícím způsobem: na prázdné plátno nakreslíme jakoukoli čáru a poté celý tento obrázek odečteme od toho původního, abychom viděli, jak moc se liší. Díky tomu, že zatím řešíme pouze černobílé obrázky, stačí odečíst každý pixel z jednoho obrázku s
+korespondujícím pixelem z toho druhého. Všechny tyto rozdíly odpovídajících si pixelů poté sečteme, umocníme na druhou a vydělíme počtem pixelů.\footnote{Této metodě se v praxi říká MSE (Mean Squared Error) a pro její používanost jsme se rozhodli pro ni.} Této hodnotě
+dále budeme říkat rozdíl čáry a originálu. Tento postup zopakujeme pro všechny další možné čáry.
 
-Následně všechny čáry podle této hodnoty seřadíme a vybereme $k$ nejlepších.
+Následně všechny čáry podle této hodnoty seřadíme a vybereme $k$ nejlepších, tedy $k$ těch s nejmenším rozdílem čáry a originálu.
 
-Teď už by to mohlo vypadat, že jsme hotoví a můžeme si užívat string-artu jak
+Teď už by to mohlo vypadat, že jsme hotoví a můžeme si užívat string-artu, jak
 jen budeme chtít. To by se nesměl v našem dosavadním řešení skrývat jeden menší
-problém. Protože každou čáru zkoušíme právě jednou může, nebo spíše měla by, být
-úplně černá. To znamená, že v každém bodě buď je nebo není čára, což nám ve
-výsledku vytvoří velmi nepřirozené obrázky.
+problém. Protože každou čáru zkoušíme na plátno přidat právě jednou, je čára vždy
+úplně černá. To znamená, že v každém bodě čára buď je, nebo není, což nám ve
+výsledku vytvoří velmi nepřirozené obrázky, neboť nemáme možnost velmi tmavá místa odlišit od těch jen trochu tmavých.
 
-Abychom tohle vyřešili musíme nějak zařídit aby mezi dvěma špendlíky mohlo vést
+Abychom toto vyřešili, musíme nějak zařídit, aby mezi dvěma špendlíky mohlo vést
 více než jedna čára. Toho bychom mohli dosáhnout triviálním rozšířením toho
 algoritmu. Prostě před přidáním každé čáry seřadíme všech $n^2$ čar. To ovšem z
 časové složitosti $O(n^2)$ udělá $O(kn^2)$. Čímž jsme si docela dost pohoršili,
 protože $k \gg n$. Naštěstí existuje i lepší způsob, ten budiž nalezen v
 následující podsekci.
-
 
 \begin{figure}[!ht]
  \label{fig:first}
@@ -170,13 +157,10 @@ def string_art(n,k)
 \subsection{Postupně zlepšujeme}
 \label{ssec:postupne-zlepsujeme}
 
-Abychom napravili obě chyby z předchozího řešení musíme celou předchozí ideu
-překopat. Místo toho abychom v každém kroku počítali všechny možné dvojice,
-začneme pouze s jedním vrcholem a spočítáme všechny čáry z něho vedoucí. Z těch
-vybereme tu nejlepší a její konec nastavíme jako začátek a spustíme celý proces
-znovu.
+Abychom napravili obě nedokonalosti našeho prvního řešení, musíme celou předchozí ideu
+překopat. Místo toho abychom v každém kroku počítali rozdíl čáry a originálu pro všechny možné dvojice bodů, začneme pouze s jedním random vybraným vrcholem a spočítáme tuto hodnotu pro všechny čáry z něho vedoucí. Z těch vybereme tu nejlepší a její koncový bod nastavíme jako počátek, opět spočítáme rozdíl každé čáry z něho vedoucí a originálu. Z koncového bodu nové nejlepší čáry spustíme celý proces znovu. Toto opakujeme $k$-krát 
 
-Tento proces opakujeme $k$-krát a efektivně jsme vyřešili oba problémy minulého
+Tímto jsme efektivně vyřešili oba problémy minulého
 algoritmu. Ovšem vyskytnul se nám jeden další. Jestliže bude na obrázku jeden
 velmi černý pruh, algoritmus bude dávat čáry jen do něj a nikam jinam. 
 
@@ -184,10 +168,11 @@ velmi černý pruh, algoritmus bude dávat čáry jen do něj a nikam jinam.
 čáru ale bílou, nakreslíme do původního obrázku.
 
 Tento algoritmus má časovou složitost $O(kn)$. V praxi se nám vyplatilo nemít
-žádný pevný počet čar $k$, ale radši se koukat jak daleko je celý string-art od
-originálu. Jakmile se tento rozdíl dostane pod nějakou konstantu tak celý
-program zastavíme. Důvod proč jsme neuvažovali tuto variantu je kvůli její
+žádný pevný počet čar $k$, ale radši porovnávat, jak daleko je celý string-artový obrázek od
+originálu. Jakmile se tento rozdíl dostane pod nějakou konstantu, celý
+program zastavíme. Důvod, proč jsme pro popsání neuvažovali tuto variantu, je kvůli její
 nejasné časové složitosti. 
+
 
 \begin{figure}
  \label{fig:second}
@@ -214,12 +199,14 @@ def string_art(n,k)
 \label{sec:vysledky}
 S programy představenými v předchozích kapitolách se nám povedlo převést spoustu
 obrázku do string-artové podoby. Mezi ty nejzajímavější patří spící Dláža. Také
-se nám povedlo udělat strig-art video. To jsme stvořili tak, že jsme do
-string-artu převedli každý snímek zvlášť a poté je zas spojili. Mezi poslední
+se nám podařilo vytvořit strig-art video tak, že jsme do
+string-artu převedli každý snímek zvlášť, a poté je zas spojili. Mezi poslední
 zajímavosti patří barevný string-art. Toho jsme docílili tak, že jsme každý z
-barevných kanálů převedli samostatně na stri-art variantu a poté všechny tři
-jednobarevné stri-arty spojily dohromady.
+barevných kanálů převedli samostatně na string-art variantu a poté všechny tři
+jednobarevné string-arty spojili dohromady.
+
 
 %here goes obrázky lool
+
 
 \end{document}
